@@ -87,4 +87,7 @@ That's it!  You get a UserRepository that already has the $db variable provided.
 Why use PHP-Container?
 ----------------------
 
-So, why do this?  Well, if you wish to swap out your Database implementation (say you're changing servers, etc.), all you have to do is change a single attribute.  You don't have to go into the constructors or all over your code to find where you provided the database yourself.  It's very simple!
+So, why do this?  Well, if you wish to swap out your Database implementation (say you're changing server`s, etc.), all you have to do is change a single attribute.  You don't have to go into the constructors or all over your code to find where you provided the database yourself.  It's very simple!
+
+It also makes your code much cleaner without having a lot of initialization stuff all over the place!
+
