@@ -1,24 +1,29 @@
+PHP-Container
+=============
+
 The PHP-Container is a dependency injection container to be used in PHP.  It behaves similar to that of Spring, if you're familiar with Java.  It allows a developer to retrieve a constructed object from the container with all of its dependencies already injected.
 
-Example:
+
+Example Usage
+-------------
 
 Say you have a UserRepository class that handles all CRUD operations (Create, Retrieve, Update, Delete) for a User class.  Obviously, this is going to need a Database, or somewhere to actually operate.  This could be a MySQL, Postgres, or Oracle database.  Or, it could just be in memory.  Regardless, you need a Database.  Your repo may look like this...
 
-<?php
-class UserRepository {
+    <?php
+      class UserRepository {
 
-  private $db;
+        private $db;
 
-  public function create(User $user) { ... }
-  public function delete(User $user) { ... }
-  public function retrieve($userId) { ... }
-  public function update(User $user) { ... }
+        public function create(User $user) { ... }
+        public function delete(User $user) { ... }
+        public function retrieve($userId) { ... }
+        public function update(User $user) { ... }
 
-  public function setDb(Database $db) {
-    $this->db = $db;
-  }
-}
-?>
+        public function setDb(Database $db) {
+          $this->db = $db;
+        }
+      }
+    ?>
 
 In this case, the repo has a need for a Database, which is an interface for whatever type of Database you want to use.  Now, if I just want a repo, why do I need to do the injections myself?  I just want to get a repo and already know the $db variable has already been set.  That's where the container comes into place.
 
