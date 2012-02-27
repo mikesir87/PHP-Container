@@ -47,10 +47,16 @@ class Container {
      * @return Container The current, and only, instance of Container.
      */
     public static function getInstance() {
-        if (self::$instance == null) {
-            self::$instance = new Container();
+      if (self::$instance == null) {
+        self::$instance = new Container();
+        foreach($this->classes->getAllClasses() as $class) {
+          /* @var $class ClassInfo */
+          if ($class->getAutoCreate()) {
+            $this->setupClass($class);
+          }
         }
-        return self::$instance;
+      }
+      return self::$instance;
     }
     
     /**
@@ -61,12 +67,6 @@ class Container {
       $this->classes = new ClassInfoSet();
       $this->resources = new ResourceInfoSet();
       $this->loadAllClasses();
-      foreach($this->classes->getAllClasses() as $class) {
-        /* @var $class ClassInfo */
-        if ($class->getAutoCreate()) {
-          $this->setupClass($class);
-        }
-      }
     }
     
     /**
