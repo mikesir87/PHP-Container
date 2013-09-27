@@ -21,6 +21,7 @@
  *         property from a class.
  * 
  * @author Michael Irwin
+ * @package container
  */
 class Container {
 
@@ -47,16 +48,22 @@ class Container {
      * @return Container The current, and only, instance of Container.
      */
     public static function getInstance() {
-      if (self::$instance == null) {
-        self::$instance = new Container();
-        foreach($this->classes->getAllClasses() as $class) {
-          /* @var $class ClassInfo */
-          if ($class->getAutoCreate()) {
-            $this->setupClass($class);
-          }
+        if (self::$instance == null) {
+            self::$instance = new Container();
         }
-      }
-      return self::$instance;
+        return self::$instance;
+    }
+    
+    /**
+     * Given an object, inject dependencies into it.
+     * @param Object $object An object to injuect dependencies for.
+     * @return Object The same object, with dependencies injected into it.
+     */
+    public function injectDependencies($object) {
+      $classInfo = new ClassInfo();
+      $classInfo->setClassName(get_class($object));
+      $classInfo->setAutowiringProperties($this->getManagedProperties(new ReflectionClass(get_class($object))));
+      return $this->setupClass($classInfo, $object);
     }
     
     /**
@@ -67,6 +74,12 @@ class Container {
       $this->classes = new ClassInfoSet();
       $this->resources = new ResourceInfoSet();
       $this->loadAllClasses();
+      foreach($this->classes->getAllClasses() as $class) {
+        /* @var $class ClassInfo */
+        if ($class->getAutoCreate()) {
+          $this->setupClass($class);
+        }
+      }
     }
     
     /**
@@ -110,8 +123,13 @@ class Container {
      */
     private function loadAllClasses() {
       $classes = get_declared_classes();
+      $objs = array();
       foreach ($classes as $class) {
-        $this->evaluateClass($class);
+        $objs[] = $this->evaluateClass($class);
+      }
+      foreach ($objs as $obj) {
+        if (method_exists($obj, "postConstruct"))
+          $obj->postConstruct();
       }
     }
     
@@ -176,6 +194,10 @@ class Container {
           $managedProperties[] = $autowire;
         }
       }
+      if ($class->getParentClass() != null) { // Check for autowiring on parent
+        $managedProperties = array_merge($managedProperties, 
+                $this->getManagedProperties($class->getParentClass()));
+      }
       return $managedProperties;
     }
     
@@ -185,19 +207,28 @@ class Container {
      * @param ClassInfo $class The class to base off of and build with.
      * @return Class An instantiated object of the class represented by $class.
      */
-    private function setupClass($class) {
+    private function setupClass($class, $obj = null) {
       $className = $class->getClassName();
-      $obj = new $className();
-
-      if (count($class->getAutowiringProperties()) == 0)
-        return new $obj;
+      if ($obj == null)
+        $obj = new $className();
       
+      if ($class->isSingleton())
+        $this->classes->assignObjectToClass($class->getReference(), $obj);
+
       foreach($class->getAutowiringProperties() as $wire) {
         /* @var $wire AutowireInfo */
         if ($wire->getAutowireType() == AutowireTypes::OBJECT) {
           $setVariable = "set" . ucfirst($wire->getPropertyName());
-          if (method_exists($obj, $setVariable)) 
-            $obj->$setVariable( $this->{$wire->getReference()} );
+          if (method_exists($obj, $setVariable)) {
+            if ($this->classes->getClass($wire->getReference()) == null) {
+              throw new InvalidArgumentException("No autowiring candidate found for " . $wire->getReference());
+            }
+            if ($this->classes->getClass($wire->getReference())->getObject() != "") {
+              $obj->$setVariable($this->classes->getClass($wire->getReference())->getObject());
+            }
+            else
+              $obj->$setVariable( $this->{$wire->getReference()} );
+          }
           else
             throw new InvalidArgumentException ("Function $setVariable doesn't 
                     exist on " . $class->getClassName());
@@ -212,14 +243,8 @@ class Container {
               $obj->$setVariable($value);
             }
           }
-          else {
-            throw new InvalidArgumentException("Don't know how to interpret " . 
-                    $wire->getPropertyName());
-          }
         }
       }
-      if (method_exists($obj, "postConstruct"))
-              $obj->postConstruct();
       return $obj;
     }
 }

@@ -5,6 +5,7 @@
  * A wrapper/utility to hold all of the ClassInfo objects in the Container.
  *
  * @author Michael Irwin
+ * @package container
  */
 class ClassInfoSet {
   
@@ -31,12 +32,12 @@ class ClassInfoSet {
   
   /**
    * Get a specific class by its reference.
-   * @param string $className The reference for the class.
+   * @param string $reference The reference for the class.
    * @return ClassInfo
    */
-  public function getClass($className) {
-    if (isset($this->classInfoSet[$className]))
-      return $this->classInfoSet[$className];
+  public function getClass($reference) {
+    if (isset($this->classInfoSet[$reference]))
+      return $this->classInfoSet[$reference];
     return null;
   }
   
@@ -63,7 +64,7 @@ class ClassInfoSet {
    * @param type $object 
    */
   public function assignObjectToClass($reference, $object) {
-    if ($this->classInfoSet[$reference] == null)
+    if (!isset($this->classInfoSet[$reference]))
       throw new InvalidArgumentException ("Cannot assign object to " . 
               $reference . " - no such object exists");
     $this->classInfoSet[$reference]->setObject($object);
@@ -77,4 +78,3 @@ class ClassInfoSet {
     return $this->classInfoSet;
   }
 }
-

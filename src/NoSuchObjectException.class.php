@@ -5,6 +5,7 @@
  * object that is not found or being managed.
  *
  * @author Michael Irwin
+ * @package container
  */
 class NoSuchObjectException extends Exception {
 
@@ -21,4 +22,3 @@ class NoSuchObjectException extends Exception {
     return $this->requestedObject;
   }
 }
-

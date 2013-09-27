@@ -5,6 +5,7 @@
  * about each of the classes.
  *
  * @author Michael Irwin
+ * @package container
  */
 class ResourceInfo {
 

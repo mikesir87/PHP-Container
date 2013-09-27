@@ -5,6 +5,7 @@
  * A wrapper of ResourceInfo objects. Much like the ClassInfoSet object.
  *
  * @author Michael Irwin
+ * @package container
  */
 class ResourceInfoSet {
   
@@ -50,7 +51,7 @@ class ResourceInfoSet {
     if ($temp != null) return $resourceName;
     
     foreach ($this->resourceInfoSet as $reference => $data) {
-      if ($data->getResourceName() == $resourceName) {
+      if ($data->getClassName() == $resourceName) {
         return $reference;
       }
     }
@@ -58,4 +59,3 @@ class ResourceInfoSet {
   }
   
 }
-

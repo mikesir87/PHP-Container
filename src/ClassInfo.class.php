@@ -6,6 +6,7 @@
  * configuration is stored in the Container using an instance of this class.
  *
  * @author Michael Irwin
+ * @package container
  */
 class ClassInfo {
 

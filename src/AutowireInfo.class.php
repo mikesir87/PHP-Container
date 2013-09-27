@@ -6,6 +6,7 @@
  * Container using this object.
  *
  * @author Michael Irwin
+ * @package container
  */
 class AutowireInfo {
   
