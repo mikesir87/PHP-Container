@@ -78,7 +78,7 @@ In this case, I'm using the @ManagedClass attribute, but I'm providing the name 
 So, now that we have everything wired together, all we have to do is ask the container for a UserRepository.  Here you go...
 
     <?php
-      $repo = Container::getInstance->userRepo;
+      $repo = Container::getInstance()->userRepo;
     ?>
 
 That's it!  You get a UserRepository that already has the $db variable provided.  You don't have to do that!
